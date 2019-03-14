@@ -19,6 +19,36 @@ func GetCategoryAction(c *gin.Context) {
 	return
 }
 
+func GetCategoryCountAction(c *gin.Context) {
+	result := utils.NewResult()
+	defer c.JSON(http.StatusOK, result)
+
+	result.Data = service.Category.GetCategoryCount()
+	return
+}
+
+func GetCategoryArticleAction(c *gin.Context) {
+	result := utils.NewResult()
+	defer c.JSON(http.StatusOK, result)
+
+	categoryIdStr := c.Query("category_id")
+	if categoryIdStr == "" {
+		result.Code = utils.ErrInvalidArgument
+		result.Msg = utils.ErrCodeMsg[result.Code]
+		return
+	}
+
+	var categoryId uint
+	if err := utils.StrToUint(categoryIdStr, &categoryId); err != nil {
+		result.Code = utils.ErrInvalidArgument
+		result.Msg = utils.ErrCodeMsg[result.Code]
+		return
+	}
+
+	result.Data = service.Category.GetCategoryArticleByID(categoryId)
+	return
+}
+
 func AddCategoryAction(c *gin.Context) {
 	var category model.Category
 	result := utils.NewResult()

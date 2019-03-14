@@ -8,3 +8,8 @@ type Tag struct {
 	Name    string     `gorm:"varchar(64)" json:"name"`
 	Article []*Article `gorm:"many2many:article_tag" json:"article"`
 }
+
+type TagCount struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}

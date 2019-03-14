@@ -3,6 +3,9 @@ package service
 import (
 	"model"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/jinzhu/gorm"
 )
 
 var Category = &categoryService{
@@ -11,6 +14,31 @@ var Category = &categoryService{
 
 type categoryService struct {
 	mutex *sync.Mutex
+}
+
+func (c *categoryService) GetCategoryCount() []*model.CategoryCount {
+	var count []*model.CategoryCount
+
+	if err := db.Select("name, count(name)").Group("name").Scan(&count).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			log.Errorln("get category count error:", err.Error())
+		}
+		return nil
+	}
+	return count
+}
+
+func (c *categoryService) GetCategoryArticleByID(id uint) []*model.ArticleBase {
+	var articles []*model.ArticleBase
+
+	if err := db.Table("articles").Where("id in(?)", db.Table("article_category").Select("article_id").Where("category_id=?", id)).Select("id, create_at, name, summary, amount").Scan(&articles).Error; err != nil {
+		if gorm.ErrRecordNotFound != err {
+			log.Errorln("get tag article by id error:", err.Error())
+		}
+		return nil
+	}
+
+	return articles
 }
 
 func (c *categoryService) GetCategory() []*model.Category {

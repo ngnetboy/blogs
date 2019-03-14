@@ -11,6 +11,8 @@ func GetRouter() *gin.Engine {
 		admin.POST("/category", AddCategoryAction)
 		admin.DELETE("/category", DeleteCategoryAction)
 		admin.PUT("/category", UpdateCategoryAction)
+		admin.GET("/category/count", GetCategoryCountAction)
+		admin.GET("/category/article", GetCategoryArticleAction)
 
 		admin.GET("/article", GetArticleAction)
 		admin.POST("/article", AddArticleAction)
@@ -19,6 +21,7 @@ func GetRouter() *gin.Engine {
 		admin.GET("/article/count", GetArticleCountAction)
 
 		admin.GET("/tag", GetTagAction)
+		admin.GET("/tag/article", GetTagArticleAction)
 	}
 
 	return router

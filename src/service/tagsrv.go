@@ -3,6 +3,8 @@ package service
 import (
 	"model"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var Tag = &tagService{
@@ -25,10 +27,27 @@ func (t *tagService) GetTagByName(name string) *model.Tag {
 	return &tag
 }
 
-func (t *tagService) GetTag() []*model.Tag {
-	var tags []*model.Tag
-	if err := db.Find(&tags).Error; err != nil {
+func (t *tagService) GetTag() []*model.TagCount {
+	var count []*model.TagCount
+
+	if err := db.Select("name, count(name)").Group("name").Scan(&count).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			log.Errorln("get category count error:", err.Error())
+		}
 		return nil
 	}
-	return tags
+	return count
+}
+
+func (t *tagService) GetTagArticleByID(tagId uint) []*model.ArticleBase {
+	var articles []*model.ArticleBase
+
+	if err := db.Table("articles").Where("id in(?)", db.Table("article_tag").Select("article_id").Where("tag_id=?", tagId)).Select("id, create_at, name, summary, amount").Scan(&articles).Error; err != nil {
+		if gorm.ErrRecordNotFound != err {
+			log.Errorln("get tag article by id error:", err.Error())
+		}
+		return nil
+	}
+
+	return articles
 }

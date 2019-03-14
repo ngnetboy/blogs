@@ -50,7 +50,7 @@ func GetArticleAction(c *gin.Context) {
 
 	if idStr != "" {
 		var articleID uint
-		if err := utils.StrToUint(idStr, articleID); err != nil {
+		if err := utils.StrToUint(idStr, &articleID); err != nil {
 			result.Code = utils.ErrInvalidArgument
 			result.Msg = utils.ErrCodeMsg[result.Code]
 			return

@@ -9,3 +9,8 @@ type Category struct {
 	Description string     `gorm:"type:varchar(512)" json:"description"`
 	Article     []*Article `gorm:"many2many:article_category" json:"article"`
 }
+
+type CategoryCount struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}

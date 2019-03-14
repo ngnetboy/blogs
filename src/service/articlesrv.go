@@ -3,6 +3,9 @@ package service
 import (
 	"model"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/jinzhu/gorm"
 )
 
 var Article = &articleService{
@@ -27,13 +30,17 @@ func (a *articleService) GetArticleByID(articleID uint) *model.Article {
 	return &article
 }
 
-func (a *articleService) GetArticle(page int) []*model.Article {
-	var articles []*model.Article
-
+func (a *articleService) GetArticle(page int) []*model.ArticleBase {
+	var articles []*model.ArticleBase
+	//var articles []*model.Article
 	// if err := db.Offset(model.Conf.PageNum * page).Find(&articles).Error; err != nil {
 	// 	return nil
 	// }
-	if err := db.Find(&articles).Error; err != nil {
+	//if err := db.Find(&articles).Error; err != nil {
+	if err := db.Table("articles").Select("id, create_at, name, summary, amount").Offset(model.Conf.PageNum * page).Scan(&articles).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			log.Errorln("get article base error:", err.Error())
+		}
 		return nil
 	}
 
